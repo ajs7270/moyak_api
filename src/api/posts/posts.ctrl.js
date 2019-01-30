@@ -28,6 +28,8 @@ exports.write = async (ctx) => {
 
 
 exports.list = async (ctx) => {
+
+    const { id } = ctx.params;
     const page = parseInt(ctx.query.page || 1, 10); // 페이지개수
     if(page<1){
         ctx.status =400;
@@ -43,8 +45,6 @@ exports.list = async (ctx) => {
             .limit(5) // (한 페이지에) 몇 개를 읽을 것인가
             .skip((page-1)*5) // 몇 개씩 스킵할 것인가
             .exec();
-            ctx.body = posts;
-
         }
 
         else if( classify.name_x() == "allergy" || classify.name_x() == "vitamin" )
@@ -55,7 +55,6 @@ exports.list = async (ctx) => {
             .limit(5) // (한 페이지에) 몇 개를 읽을 것인가
             .skip((page-1)*5) // 몇 개씩 스킵할 것인가
             .exec();
-            ctx.body = posts;
         }
 
         else
@@ -66,9 +65,8 @@ exports.list = async (ctx) => {
             .limit(5) // (한 페이지에) 몇 개를 읽을 것인가
             .skip((page-1)*5) // 몇 개씩 스킵할 것인가
             .exec();
-            ctx.body = posts;
         }
-        
+        ctx.body = posts;
 
     } catch(e) {
         ctx.throw(e, 500);
