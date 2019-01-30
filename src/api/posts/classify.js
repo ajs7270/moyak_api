@@ -14,8 +14,6 @@ var m5 = 0;  // 천식 |*|*|*|*|
 
 class API_selector{
         constructor(categories, symptom){
-            this.categories = categories;
-            this.symptom = symptom;
             this.efficacy_effect = new Array(); // 효능효과
             this.ingredient = new Array();//성분
             this.no_ingredient = new Array(); // 불필요 성분
@@ -26,24 +24,24 @@ class API_selector{
             {
                 efficacy_effect.push("통증");
             
-                if(m1 == 1) // 열
+                if( symptom.indexOf('열') != -1 ) // 열
                     ingredient.push("acetaminophen");
                     ingredient.push("ibuprofen");
                     ingredient.push("dexibuprofen"); 
             
-                if(m2 == 1) // 근육통
+                if( symptom.indexOf('근육통') != -1 ) // 근육통
                     ingredient.push("naproxen");
                     ingredient.push("naproxen sodium");
                     ingredient.push("chlorzoxazone");
             
-                if(m3 == 1 ) // 염증성 통증 ~ 포함X
+                if( symptom.indexOf('염증성 통증') != -1 ) // 염증성 통증 ~ 포함X
                     no_ingredient.push("acetaminophen");
             
-                if( m4 == 1 ) // 위장장애
+                if( symptom.indexOf('위장장애') != -1 ) // 위장 장애
                     ingredient.push("acetaminophen")
                     ingredient.push("ibuprofen");
             
-                if( m5 == 1 )
+                if( symptom.indexOf('천식') != -1 ) //천식
                     ingredient.push("acetaminophen");
             } 
             // 감기
@@ -51,17 +49,17 @@ class API_selector{
             {   
                 efficacy_effect.push('감기');
             
-                if(m1==1)
+                if( symptom.indexOf('콧물') != -1 ) // 콧물
                 ingredient.push("chlorpheniramine");
-                ingredient.push("methylephedrine");//snot;
+                ingredient.push("methylephedrine");
             
-                if(m2==1)
+                if( symptom.indexOf('기침') != -1 ) // 기침
                 ingredient.push("guaifenesin");
-                ingredient.push("dextromethophan");//cough;
+                ingredient.push("dextromethophan");
             
-                if(m3==1)
+                if( symptom.indexOf('몸살 열') != -1 ) // 몸살 열
                 ingredient.push("acetaminophen");
-                ingredient.push("ibuprofen");//sick_fever;
+                ingredient.push("ibuprofen");
             
             }
                 //피부 질환 skin_disease 
@@ -69,13 +67,13 @@ class API_selector{
             { 
                 ingredient.push("aluminum chloride"); //염화 알루미늄-공통적으로 다있는것
                 
-                if(m1==1)//무좀이면
+                if( symptom.indexOf('무좀') != -1 )//무좀
                     efficacy_effect.push("무좀");
                     
-                if(m2==1)//아토피면
+                if( symptom.indexOf('아토피') != -1 )//아토피
                     efficacy_effect.push("아토피");
                 
-                if(m3==1)//상처면
+                if( symptom.indexOf('상처') != -1)//상처
                     efficacy_effect.push("상처");
                     
             }
@@ -89,7 +87,7 @@ class API_selector{
             //위장 질환Gastrointestinal disease
             else if ( categories == 'Gastrointestinal_disease' )
             {  
-                if(m1==1) // 위통 위산 과다
+                if( symptom.indexOf('위통 위산 과다') != -1 ) // 위통 위산 과다
                     efficacy_effect.push("위통");
                     efficacy_effect.push("위산 과다");
                 
@@ -98,29 +96,29 @@ class API_selector{
             //장 질환Intestinal disease **키워드 검사로되는건지?? 위에 위장질환 가스랑 겹치잖아
             else if( categories == 'Intestinal_disease' )
             {
-                if(m1==1)//가스
+                if( symptom.indexOf('가스') != -1 )//가스
                     efficacy_effect.push("가스");
-                if(m2==1) //설사
+                if( symptom.indexOf('설사') != -1 ) //설사
                     efficacy_effect.push("설사");
-                if(m3==1) //변비
+                if( symptom.indexOf('변비') != -1 ) //변비
                     efficacy_effect.push("변비");
             }
         
             //여성 질환female_disease
             else if ( categories == 'female_disease')
             {
-                if(m1==1) //월경
+                if( symptom.indexOf('월경') != -1 ) //월경
                     efficacy_effect.push("월경");
-                if(m2==1) //피임
+                if( symptom.indexOf('피임') != -1) //피임
                     efficacy_effect.push("피임");
-                if(m3==1) // 질염
+                if( symptom.indexOf('질염') != -1) // 질염
                     efficacy_effect.push("질염") ;
             }
               
             if ( categories == "painkiller" || categories == "cold" || categories == "skin_disease" )
             {
                 // in & nin 활용
-                const posts = await Post.find( { $and:[{ ee_doc : {$in: classify.symptom()}},{material_name : {$in: classify.ingredient()}},{ material_name : {$nin: classify.no_ingredient()}} ]}  )
+                const posts = await Post.find( { $and:[{ ee_doc : {$in: efficacy_effect}},{material_name : {$in: ingredient}},{ material_name : {$nin: no_ingredient}} ]}  )
                 .sort({_id: 1 }) // 1 : 오름차순 , -1 : 내림차순
                 .limit(5) // (한 페이지에) 몇 개를 읽을 것인가
                 .skip((page-1)*5) // 몇 개씩 스킵할 것인가
@@ -130,7 +128,7 @@ class API_selector{
             else if( categories == "allergy" || categories == "vitamin" )
             {
                 // in & nin 활용
-                const posts = await Post.find( { class_no : {$in: classify.class_no()}}  )
+                const posts = await Post.find( { class_no : {$in: class_no}}  )
                 .sort({_id: 1 }) // 1 : 오름차순 , -1 : 내림차순
                 .limit(5) // (한 페이지에) 몇 개를 읽을 것인가
                 .skip((page-1)*5) // 몇 개씩 스킵할 것인가
@@ -140,7 +138,7 @@ class API_selector{
             else
             {
                 // in & nin 활용
-                const posts = await Post.find( { ee_doc : {$in: classify.symptom()}} )
+                const posts = await Post.find( { ee_doc : {$in: efficacy_effect}} )
                 .sort({_id: 1 }) // 1 : 오름차순 , -1 : 내림차순
                 .limit(5) // (한 페이지에) 몇 개를 읽을 것인가
                 .skip((page-1)*5) // 몇 개씩 스킵할 것인가
