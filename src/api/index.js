@@ -4,8 +4,12 @@
 const Router = require('koa-router');
 const posts = require('./posts');
 
+
 const api = new Router();
 
+const auth = require('./auth');
+
+api.use('/auth', auth.routes());
 api.use('/posts', posts.routes());
 
 module.exports = api;
