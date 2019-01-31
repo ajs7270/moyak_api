@@ -14,35 +14,36 @@ var m5 = 0;  // 천식 |*|*|*|*|
 
 class API_selector{
         constructor(categories, symptom){
-            this.efficacy_effect = new Array(); // 효능효과
-            this.ingredient = new Array();//성분
-            this.no_ingredient = new Array(); // 불필요 성분
-            this.class_no = new Array();
-
+            this.efficacy_effect = []; // 효능효과
+            this.ingredient = [];//성분
+            this.no_ingredient = []; // 불필요 성분
+            this.class_no = [];
+            this.posts = [];
             // 진통제
             if ( categories == 'painkiller' ) // 안에 들어가는거 문자열인지 나중에 확인하기
             {
                 efficacy_effect.push("통증");
             
                 if( symptom.indexOf('열') != -1 ) // 열
-                    ingredient.push("acetaminophen");
-                    ingredient.push("ibuprofen");
-                    ingredient.push("dexibuprofen"); 
+                    ingredient.push("아세트아미노펜");
+                    ingredient.push("이부프로펜");
+                    ingredient.push("덱시부프로펜"); 
             
                 if( symptom.indexOf('근육통') != -1 ) // 근육통
-                    ingredient.push("naproxen");
-                    ingredient.push("naproxen sodium");
-                    ingredient.push("chlorzoxazone");
+                    ingredient.push("나프록센");
+                    //ingredient.push("naproxen sodium");
+                    ingredient.push("클로르족사존");
             
                 if( symptom.indexOf('염증성 통증') != -1 ) // 염증성 통증 ~ 포함X
-                    no_ingredient.push("acetaminophen");
+                    ingredient.push("나프록센");
+                    no_ingredient.push("아세트아미노펜");
             
                 if( symptom.indexOf('위장장애') != -1 ) // 위장 장애
-                    ingredient.push("acetaminophen")
-                    ingredient.push("ibuprofen");
+                    ingredient.push("아세트아미노펜");
+                    ingredient.push("이부프로펜");
             
                 if( symptom.indexOf('천식') != -1 ) //천식
-                    ingredient.push("acetaminophen");
+                    ingredient.push("아세트아미노펜");
             } 
             // 감기
             else if(categories== 'cold' )
@@ -50,22 +51,22 @@ class API_selector{
                 efficacy_effect.push('감기');
             
                 if( symptom.indexOf('콧물') != -1 ) // 콧물
-                ingredient.push("chlorpheniramine");
-                ingredient.push("methylephedrine");
+                ingredient.push("클로르페니라민");
+                ingredient.push("메틸에페드린");
             
                 if( symptom.indexOf('기침') != -1 ) // 기침
-                ingredient.push("guaifenesin");
-                ingredient.push("dextromethophan");
+                ingredient.push("구아이페네신");
+                ingredient.push("덱스트로메토르판");
             
                 if( symptom.indexOf('몸살 열') != -1 ) // 몸살 열
-                ingredient.push("acetaminophen");
-                ingredient.push("ibuprofen");
+                ingredient.push("아세트아미노펜");
+                ingredient.push("이부프로펜");
             
             }
                 //피부 질환 skin_disease 
             else if(categories== 'skin_disease')
             { 
-                ingredient.push("aluminum chloride"); //염화 알루미늄-공통적으로 다있는것
+                ingredient.push("염화알루미늄"); //염화 알루미늄-공통적으로 다있는것
                 
                 if( symptom.indexOf('무좀') != -1 )//무좀
                     efficacy_effect.push("무좀");
@@ -112,13 +113,19 @@ class API_selector{
                 if( symptom.indexOf('피임') != -1) //피임
                     efficacy_effect.push("피임");
                 if( symptom.indexOf('질염') != -1) // 질염
-                    efficacy_effect.push("질염") ;
+                    efficacy_effect.push("질염");
             }
               
+            else if ( categories == 'vitamin' )
+            {
+                class_no.push('비타민'); 
+            }
+            //
+
             if ( categories == "painkiller" || categories == "cold" || categories == "skin_disease" )
             {
                 // in & nin 활용
-                const posts = await Post.find( { $and:[{ ee_doc : {$in: efficacy_effect}},{material_name : {$in: ingredient}},{ material_name : {$nin: no_ingredient}} ]}  )
+                this.posts =  Post.find( { $and:[{ ee_doc : {$in: efficacy_effect}},{material_name : {$in: ingredient}},{ material_name : {$nin: no_ingredient}} ]}  )
                 .sort({_id: 1 }) // 1 : 오름차순 , -1 : 내림차순
                 .limit(5) // (한 페이지에) 몇 개를 읽을 것인가
                 .skip((page-1)*5) // 몇 개씩 스킵할 것인가
@@ -128,7 +135,7 @@ class API_selector{
             else if( categories == "allergy" || categories == "vitamin" )
             {
                 // in & nin 활용
-                const posts = await Post.find( { class_no : {$in: class_no}}  )
+                this.posts =  Post.find( { class_no : {$in: class_no}}  )
                 .sort({_id: 1 }) // 1 : 오름차순 , -1 : 내림차순
                 .limit(5) // (한 페이지에) 몇 개를 읽을 것인가
                 .skip((page-1)*5) // 몇 개씩 스킵할 것인가
@@ -138,13 +145,18 @@ class API_selector{
             else
             {
                 // in & nin 활용
-                const posts = await Post.find( { ee_doc : {$in: efficacy_effect}} )
+                this.posts =  Post.find( { ee_doc : {$in: efficacy_effect}} )
                 .sort({_id: 1 }) // 1 : 오름차순 , -1 : 내림차순
                 .limit(5) // (한 페이지에) 몇 개를 읽을 것인가
                 .skip((page-1)*5) // 몇 개씩 스킵할 것인가
                 .exec();
             }
         }
+        
+        get Posts (){
+            return this.posts;
+        }
+        
 }
 
 exports.ingredient = function()

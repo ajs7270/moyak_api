@@ -9,6 +9,6 @@ posts.get('/', postsCtrl.list); // 지금은 얘만 쓰는거임
 posts.post('/', postsCtrl.write);
 posts.get('/:id', postsCtrl.read);
 posts.delete('/:id', postsCtrl.remove);
-posts.patch('/', postsCtrl.update);
+//posts.patch('/', postsCtrl.update);
 
 module.exports = posts;
