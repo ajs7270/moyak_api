@@ -120,12 +120,19 @@ class API_selector{
             {
                 class_no.push('비타민'); 
             }
-            //
+            
+            // 성분명 찾기 위한 준비
+            var search_ingredient = [];
+
+            for(var i = 0 ; i < ingredient.length ; i++)
+                search_ingredient[i] = new RegExp(ingredient[i]);
+
+
 
             if ( categories == "painkiller" || categories == "cold" || categories == "skin_disease" )
             {
                 // in & nin 활용
-                this.posts =  Post.find( { $and:[{ ee_doc : {$in: efficacy_effect}},{material_name : {$in: ingredient}},{ material_name : {$nin: no_ingredient}} ]}  )
+                this.posts =  Post.find( { $and:[{ ee_doc : {$in: efficacy_effect}},{material_name : {$in: search_ingredient}},{ material_name : {$nin: no_ingredient}} ]}  )
                 .sort({_id: 1 }) // 1 : 오름차순 , -1 : 내림차순
                 .limit(5) // (한 페이지에) 몇 개를 읽을 것인가
                 .skip((page-1)*5) // 몇 개씩 스킵할 것인가

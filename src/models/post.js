@@ -14,7 +14,7 @@ const Post = new Schema({
     item_permit_date: String,
     class_no: String,
     chart: String,
-    material_name: [String],
+    material_name: String,
     ee_doc: String,
     ud_doc: String,
     nb_doc: String,
